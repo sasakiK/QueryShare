@@ -1,0 +1,159 @@
+
+/* ---------- whole ---------- */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  /* background-color: #73CDC4; */
+  /* background-color: #FEDC0F; */
+  background-color: #FBE37D;
+  color: #373939;
+}
+
+/* ---------- wrapper ---------- */
+
+div#wrapper{
+  max-width: 1200px;
+  width: 80% !important;
+  margin: auto;
+}
+
+/* ---------- header ---------- */
+
+div#header-fixed{
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 50px;
+}
+
+div#header-bk {
+  background-color: #373939;
+	height:50px;
+	width:100%;
+  /* padding-top: 12px; */
+}
+
+
+div#header {
+  font-size: 20px;
+  margin-left: 7%;
+  line-height: 50px;
+  padding: 0 25px;
+  font-style: 'Dosis';
+  float: left;
+  color: #FBE37D;
+}
+
+ /* right link */
+
+a#header-right {
+  line-height: 50px;
+  padding: 0 25px;
+  color: white;
+  display: block;
+  float: left;
+  transition: all 0.5s;
+}
+
+a#header-right:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+
+/* ---------- footer ---------- */
+
+
+div#footer-fixed{
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  height: 35px;
+  font-style: 'Dosis';
+}
+
+div#footer-bk {
+  background-color: #373939;
+	height:35px;
+	width:100%;
+  padding-top: 5px;
+}
+
+
+div#footer {
+  font-size: 14px;
+  text-align: center;
+  margin-top: 3px;
+}
+
+
+a {
+  color: #BDE2F5;
+  text-decoration: none;
+}
+
+/* ---------- title ---------- */
+
+h1#title_h{
+ border-top : solid 7px #373939;
+ border-bottom : solid 7px #373939;
+ padding: 5px 0;
+ width: 50%;
+ color: #373939;
+ font-size: 4vw;
+ position: auto;
+ margin: auto;
+ margin-bottom: 100px;
+ margin-top: 135px;
+ font-weight: bold;
+ font-family: 'Montserrat';
+}
+
+
+
+/* ---------- radio button ---------- */
+
+
+/* ---------- table ---------- */
+
+.react-grid-Container{
+ position: auto;
+ margin:   auto;
+ width:    100%;
+}
+
+
+/* ---------- submit ---------- */
+
+.square_btn {
+    display: inline-block;
+    padding: 0.3em 1em;
+    text-decoration: none;
+    color: #67c5ff;
+    border: solid 2px #373939;
+    border-radius: 3px;
+    transition: .4s;
+}
+
+.square_btn:hover {
+    background: #373939;
+    color: white;
+}
+
+
+button#button{
+  display: inline-block;
+  padding: 0.3em 1em;
+  text-decoration: none;
+  color: #373939;
+  border: solid 2px #373939;
+  border-radius: 3px;
+  transition: .4s;
+}
+button#button:hover{
+  background: #373939;
+  color: white;
+}
