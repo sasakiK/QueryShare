@@ -7,8 +7,8 @@ html, body {
   width: 100%;
   /* background-color: #73CDC4; */
   /* background-color: #FEDC0F; */
-  background-color: #FBE37D;
-  color: #373939;
+  background-color: #5DC8BB;
+  color: #666666;
 }
 
 /* ---------- wrapper ---------- */
@@ -30,6 +30,7 @@ div#header-fixed{
 }
 
 div#header-bk {
+  /* background-color: #569CB9; */
   background-color: #373939;
 	height:50px;
 	width:100%;
@@ -44,7 +45,7 @@ div#header {
   padding: 0 25px;
   font-style: 'Dosis';
   float: left;
-  color: #FBE37D;
+  color: #569CB9;
 }
 
  /* right link */
@@ -98,12 +99,12 @@ a {
 /* ---------- title ---------- */
 
 h1#title_h{
- border-top : solid 7px #373939;
- border-bottom : solid 7px #373939;
+ /* border-top : solid 7px #373939;
+ border-bottom : solid 7px #373939; */
  padding: 5px 0;
- width: 50%;
+ width: 70%;
  color: #373939;
- font-size: 4vw;
+ font-size: 6vw;
  position: auto;
  margin: auto;
  margin-bottom: 100px;
@@ -149,9 +150,12 @@ button#button{
   padding: 0.3em 1em;
   text-decoration: none;
   color: #373939;
-  border: solid 2px #373939;
+  border: solid 4px #373939;
   border-radius: 3px;
   transition: .4s;
+  height: 54px;
+  width: 19%;
+  font-size: 24px;
 }
 button#button:hover{
   background: #373939;
