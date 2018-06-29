@@ -42,8 +42,8 @@ app.scripts.config.serve_locally = True
 app.config.suppress_callback_exceptions = True
 
 # current _username
-# c_username = auth._username_password_list[0][0]
-c_username = auth.get_username()
+c_username = auth._username_password_list[0][0]
+# c_username = auth.get_username()_
 
 
 # sql database

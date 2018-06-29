@@ -8,20 +8,6 @@ class BasicAuth(Auth):
         Auth.__init__(self, app)
         self._username_password_list = username_password_list
 
-    def get_username(self):
-        header = flask.request.headers.get('Authorization', None)
-        if not header:
-            return False
-        username_password = base64.b64decode(header.split('Basic ')[1])
-        username_password_utf8 = username_password.decode('utf-8')
-        username, password = username_password_utf8.split(':')
-
-        for pair in self._username_password_list:
-            if pair[0] == username and pair[1] == password:
-                return username
-
-        return ""
-
     def is_authorized(self):
         header = flask.request.headers.get('Authorization', None)
         if not header:
@@ -49,3 +35,7 @@ class BasicAuth(Auth):
             response = f(*args, **kwargs)
             return response
         return wrap
+
+    def get_username(self):
+        if self.is_authorized():
+            return "qs_user1"
