@@ -4,7 +4,7 @@ import sys
 import dash
 import plotly
 import sqlite3
-import dash_auth
+import dash_auth_edit as dash_auth
 import loremipsum
 import numpy as np
 import pandas as pd
@@ -17,9 +17,19 @@ from flask import send_from_directory
 from loremipsum import get_sentences
 
 
+
+# --------------------------- preprocessing ---------------------------
+
+# user database
+conn_user = sqlite3.connect("data/user_db.db")
+df_user_table = pd.read_sql("select * from user_table", conn_user)
+
+
+# --------------------------- define app ---------------------------
+
 # Keep this out of source code repository - save in a file or a database
 VALID_USERNAME_PASSWORD_PAIRS = [
-    ['queryshare_user', 'ETjKiz24']
+    [name, passward] for name,passward in  zip(df_user_table.Name, df_user_table.Passward)
 ]
 app = dash.Dash('auth')
 auth = dash_auth.BasicAuth(
@@ -27,23 +37,21 @@ auth = dash_auth.BasicAuth(
     VALID_USERNAME_PASSWORD_PAIRS
 )
 app.title = 'Query Share'
-# app.css.config.serve_locally = True
+app.css.config.serve_locally = True
 app.scripts.config.serve_locally = True
 app.config.suppress_callback_exceptions = True
 
+# current _username
+# c_username = auth._username_password_list[0][0]
+c_username = auth.get_username()
 
-# --------------------------- preprocessing ---------------------------
-
-
-# load objects or other (To use it, like "processing.objname")
-# conn = sqlite3.connect("iris_db.db")
-# df_iris = pd.read_sql("select * from iris_test", conn)
 
 # sql database
 conn_sqldb = sqlite3.connect("data/sql_db.db")
 df_sql_table = pd.read_sql("select * from sql_table", conn_sqldb)
-c_user_id = 'AAA'
-sql_table_current = df_sql_table.query('ID in "' + c_user_id + '"')
+sql_table_current = df_sql_table.query('ID in "' + c_username + '"')
+
+
 
 # --------------------------- define function -------------------------
 
@@ -72,7 +80,7 @@ title_components = html.Div([
         html.Div([
             html.Div([
                 html.Div(["Query Share"], id="header"),
-                html.Div([dcc.Link('Write Query', href='/add_player', id='header-right')],
+                html.Div([dcc.Link(c_username, href='/add_player', id='header-right')],
                          style={'cursor': 'pointer', 'float': 'right', 'margin-right': '7%'}),
                 html.Div([dcc.Link('TOP', href='/', id='header-right')],
                          style={'cursor': 'pointer', 'float': 'right'})
@@ -104,31 +112,26 @@ page_1_layout = html.Div([
 
     title_components,
 
-    # html.Div([
-    #     html.Div(
-    #         html.H1("練習メニューを最適化します！")
-    #         )
-    # ], style={'width': '100%', 'text-align':'center'}),
-
-    # dropdown div
     html.Div([
 
-    html.Div([
-        dcc.Tabs(
-            tabs=[{'label': i, 'value': j} for i,j in zip(sql_table_current.Name,
-                                                          sql_table_current.index.tolist())
-            ],
-            value=1,
-            id='tabs',
-            vertical=False
-        ),
-        html.Div(id='tab-output')
-    ], style={
-        'width': '100%',
-        'margin-left': 'auto',
-        'margin-right': 'auto',
-        'margin-bottom': '5%'
-    }),
+        html.Div([
+            dcc.Tabs(
+                tabs=[{'label': i, 'value': j} for i,j in zip(sql_table_current.Name,
+                                                              sql_table_current.index.tolist())
+                ],
+                value=1,
+                id='tabs',
+                # vertical=False,
+                style={
+                    }
+            ),
+            html.Div(id='tab-output')
+        ], style={
+            'width': '100%',
+            'margin-left': 'auto',
+            'margin-right': 'auto',
+            'margin-bottom': '5%'
+        }),
 
 
 
@@ -211,7 +214,15 @@ def execte_query(n_clicks, value):
     statement = value
     df_fromdb = pd.read_sql(statement, conn)
     return df_fromdb.to_dict('records')
-    # table name is linnerud_test
+
+# @app.callback([Input('button-save', 'n_clicks')],
+#               [State('input_query', 'value')])
+# def execte_query(n_clicks, value):
+#     conn = sqlite3.connect("data/test_db.db")
+#     # define statement
+#     statement = value
+#     df_fromdb = pd.read_sql(statement, conn)
+#     return df_fromdb.to_dict('records')
 
 
 
