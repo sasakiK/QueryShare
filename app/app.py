@@ -2,27 +2,30 @@ import os
 import io
 import sys
 import dash
+import plotly
 import sqlite3
+import dash_auth
 import loremipsum
 import numpy as np
 import pandas as pd
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_table_experiments as dt
-
 from dash.dependencies import Input, Output, State
 
 from flask import send_from_directory
-
-# import dash
-# from dash.dependencies import Input, Output
-# import dash_core_components as dcc
-# import dash_html_components as html
 from loremipsum import get_sentences
 
 
-
-app = dash.Dash()
+# Keep this out of source code repository - save in a file or a database
+VALID_USERNAME_PASSWORD_PAIRS = [
+    ['queryshare_user', 'ETjKiz24']
+]
+app = dash.Dash('auth')
+auth = dash_auth.BasicAuth(
+    app,
+    VALID_USERNAME_PASSWORD_PAIRS
+)
 app.title = 'Query Share'
 # app.css.config.serve_locally = True
 app.scripts.config.serve_locally = True
@@ -31,9 +34,16 @@ app.config.suppress_callback_exceptions = True
 
 # --------------------------- preprocessing ---------------------------
 
+
 # load objects or other (To use it, like "processing.objname")
 # conn = sqlite3.connect("iris_db.db")
 # df_iris = pd.read_sql("select * from iris_test", conn)
+
+# sql database
+conn_sqldb = sqlite3.connect("data/sql_db.db")
+df_sql_table = pd.read_sql("select * from sql_table", conn_sqldb)
+c_user_id = 'AAA'
+sql_table_current = df_sql_table.query('ID in "' + c_user_id + '"')
 
 # --------------------------- define function -------------------------
 
@@ -72,7 +82,8 @@ title_components = html.Div([
 
     # title
     html.Div([
-        html.H1(['Query Share'], id='title_h')
+        # html.H1(['Query Share'], id='title_h')
+        html.H1([''], id='title_h')
     ], style={'width': '100%', 'text-align':'center'})
 ])
 
@@ -104,11 +115,8 @@ page_1_layout = html.Div([
 
     html.Div([
         dcc.Tabs(
-            tabs=[
-                {'label': 'get Treatment data', 'value': 1},
-                {'label': 'get Diseasename data', 'value': 2},
-                {'label': 'merge all data', 'value': 3},
-                {'label': 'test query', 'value': 4},
+            tabs=[{'label': i, 'value': j} for i,j in zip(sql_table_current.Name,
+                                                          sql_table_current.index.tolist())
             ],
             value=1,
             id='tabs',
@@ -137,12 +145,7 @@ style={'position': 'relative', 'width': '100%', 'font-family': 'Noto Sans JP'})
 
 @app.callback(Output('tab-output', 'children'), [Input('tabs', 'value')])
 def display_content(value):
-    test_query = [
-        "SELECT * FROM linnerud_test where jumps > 100;",
-        "SELECT * \nFROM iris\nWHERE Species = 'setosa'",
-        "SELECT * FROM iris WHERE ...",
-        "select x from test order by x collate reverse",
-    ]
+    test_query=[statement for statement in sql_table_current.Statement],
 
     return html.Div([
         html.Br(),
@@ -150,7 +153,7 @@ def display_content(value):
         dcc.Textarea(
             id="input_query",
             placeholder='Please write query',
-            value=test_query[value-1],
+            value=test_query[0][value-1],
             style={'width': '99%',
                    'display': 'table',
                    'position': 'auto',
@@ -165,13 +168,18 @@ def display_content(value):
 
         )],style={'width' : '100%'}
         ),
-    html.Button('RUN', id='button',
-                className='square_btn',
-                style={'width': '20%',
-                'display': 'table',
-                'position': 'auto',
-                'margin': 'auto'}
-                ),
+        html.Div([
+            html.Ul([
+                html.Li(html.Button('RUN',
+                                     id='button-run',
+                                     className='square_btn')),
+                html.Li(html.Button('SAVE',
+                                     id='button-save',
+                                     className='square_btn')),
+            ], style={'list-style':'none',
+                      'display': 'flex',
+                      'justify-content': 'flex-end'})
+        ]),
     # define table app_layout
     html.Div([
         dt.DataTable(
@@ -195,7 +203,7 @@ def display_content(value):
         'background-color': "white"
     })
 @app.callback(Output('datatable', 'rows'),
-              [Input('button', 'n_clicks')],
+              [Input('button-run', 'n_clicks')],
               [State('input_query', 'value')])
 def execte_query(n_clicks, value):
     conn = sqlite3.connect("data/test_db.db")

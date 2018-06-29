@@ -11,7 +11,8 @@ RUN pip install pulp \
                 loremipsum \
                 #dash-core-components==0.22.1  \
                 dash_table_experiments \
-                pandas
+                pandas \
+                dash-auth
 
 WORKDIR /app
 COPY app /app

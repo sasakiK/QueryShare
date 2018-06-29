@@ -129,35 +129,35 @@ h1#title_h{
 
 /* ---------- submit ---------- */
 
-.square_btn {
-    display: inline-block;
-    padding: 0.3em 1em;
-    text-decoration: none;
-    color: #67c5ff;
-    border: solid 2px #373939;
-    border-radius: 3px;
-    transition: .4s;
-}
 
-.square_btn:hover {
-    background: #373939;
-    color: white;
-}
-
-
-button#button{
-  display: inline-block;
-  padding: 0.3em 1em;
+button#button-run{
+  margin-right: 15px;
+  /*padding: 0.3em 1em 0.3em 1em; */
   text-decoration: none;
-  color: #373939;
-  border: solid 4px #373939;
+  color: #2962C4;
+  border: solid 4px #2962C4;
   border-radius: 3px;
   transition: .4s;
-  height: 54px;
-  width: 19%;
-  font-size: 24px;
+  height: 34px;
+  font-size: 22px;
 }
-button#button:hover{
-  background: #373939;
+button#button-run:hover{
+  background: #2962C4;
+  color: white;
+}
+
+button#button-save{
+  margin-right: 15px;
+  /*padding: 0.3em 1em 0.3em 1em; */
+  text-decoration: none;
+  color: #62C9BE;
+  border: solid 4px #62C9BE;
+  border-radius: 3px;
+  transition: .4s;
+  height: 34px;
+  font-size: 22px;
+}
+button#button-save:hover{
+  background: #62C9BE;
   color: white;
 }
