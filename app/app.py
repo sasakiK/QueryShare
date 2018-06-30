@@ -42,13 +42,13 @@ app.css.config.serve_locally = True
 app.scripts.config.serve_locally = True
 app.config.suppress_callback_exceptions = True
 
-CACHE_CONFIG = {
-    # try 'filesystem' if you don't want to setup redis
-    'CACHE_TYPE': 'redis',
-    'CACHE_REDIS_URL': os.environ.get('REDIS_URL', 'localhost:6379')
-}
-cache = Cache()
-cache.init_app(app.server, config=CACHE_CONFIG)
+# CACHE_CONFIG = {
+#     # try 'filesystem' if you don't want to setup redis
+#     'CACHE_TYPE': 'redis',
+#     'CACHE_REDIS_URL': os.environ.get('REDIS_URL', 'localhost:6379')
+# }
+# cache = Cache()
+# cache.init_app(app.server, config=CACHE_CONFIG)
 
 
 # current _username
@@ -222,24 +222,30 @@ def display_content(value):
         'background-color': "white"
     })
 @app.callback(Output('datatable', 'rows'),
-              [Input('button-run', 'n_clicks'),
-               Input('tabs', 'value')],
+              [Input('button-run', 'n_clicks')],
+               # Input('tabs', 'value')],
               [State('input_query', 'value')])
-def execte_query(n_clicks, tab_value, value):
+def execte_query(n_clicks, value):
     # dbに対してTextareaのvalueを実行
-    conn = sqlite3.connect("data/sql_db.db")
+    conn_test = sqlite3.connect("data/test_db.db")
     # define statement
     statement = value
-    df_fromdb = pd.read_sql(statement, conn)
-
-    # RUNのstatementに変更
-    c = conn_sqldb.cursor()
-    change_commit_sql = "UPDATE sql_table SET Statement = {} WHERE Index = {}".format(value, tab_value-1)
-    c.execute(change_commit_sql)
-    conn_sql.commit()
-    # UPDATE テーブル名 SET カラム名 = 更新後の値 where name = 更新前の値;
+    df_fromdb = pd.read_sql(statement, conn_test)
 
     return df_fromdb.to_dict('records')
+    # # RUNのstatementに変更
+    # c = conn_sqldb.cursor()
+    # # change_commit_sql = "UPDATE sql_table SET Statement = {} WHERE Index = {}".format(value, tab_value-1)
+    # change_commit_sql = "replace into test_table(id,val) values(2,5);".format(value, tab_value-1)
+    # c.execute(change_commit_sql)
+    # conn_sql.commit()
+
+
+
+
+
+
+
 
 # @app.callback([Input('button-save', 'n_clicks')],
 #               [State('input_query', 'value')])
