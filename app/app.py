@@ -17,6 +17,8 @@ from flask_caching import Cache
 from flask import send_from_directory
 from loremipsum import get_sentences
 
+# other filesystems
+# from apps import application, app1, app2, app3
 
 
 # --------------------------- preprocessing ---------------------------
@@ -24,6 +26,9 @@ from loremipsum import get_sentences
 # user database
 conn_user = sqlite3.connect("data/user_db.db")
 df_user_table = pd.read_sql("select * from user_table", conn_user)
+
+# inmemory database
+con_memory = sqlite3.connect(":memory:")
 
 
 # --------------------------- define app ---------------------------
@@ -155,7 +160,7 @@ page_1_layout = html.Div([
 
 ],
 id='wrapper',
-style={'position': 'relative', 'width': '100%', 'font-family': 'Noto Sans JP'})
+style={'position': 'relative', 'width': '100%', 'font-family': 'Mo'})
 
 
 
@@ -168,7 +173,7 @@ def display_content(value):
         html.Br(),
         html.Div([
         dcc.Textarea(
-            id="input_query",
+            id="input-query",
             placeholder='Please write query',
             value=test_query[0][value-1],
             style={'width': '99%',
@@ -224,7 +229,7 @@ def display_content(value):
 @app.callback(Output('datatable', 'rows'),
               [Input('button-run', 'n_clicks')],
                # Input('tabs', 'value')],
-              [State('input_query', 'value')])
+              [State('input-query', 'value')])
 def execte_query(n_clicks, value):
     # dbに対してTextareaのvalueを実行
     conn_test = sqlite3.connect("data/test_db.db")
@@ -298,17 +303,17 @@ page_2_layout = html.Div([
     html.Div([
         html.Div([
                 html.H2("New file name."),
-                dcc.Input(id='input-box',
+                dcc.Input(id='input-name',
                           type='url',
                           placeholder='please write filename',
                           style=input_style)
                   ],
                  style={'width': '100%'}),
-        html.Button('Create', id='button', className='button-bop', style={'margin-bottom': '3%'}),
+        html.Button('Create', id='button-new', className='button-bop', style={'margin-bottom': '3%'}),
         html.Div(id='output-container-button',
                  children='Enter a value and press submit'),
         html.Div(id="save-output")
-    ], style={'width': '100%', 'color': '#373939', 'font-style': 'Noto Sans JP' }),
+    ], style={'width': '100%', 'color': '#373939', 'font-style': 'Montserrat' }),
 
     footer_components
 
@@ -316,17 +321,29 @@ page_2_layout = html.Div([
 style={'position': 'relative', 'width': '100%', 'font-family': 'Noto Sans JP'})
 
 @app.callback(Output('save-output', 'children'),
-              [Input('button-save', 'n_clicks')],
-              [State('input_name', 'value')])
-def execte_query(value):
+              [Input('button-new', 'n_clicks')],
+              [State('input-name', 'value')])
+def execte_query(n_clicks, value):
     c = conn_sqldb.cursor()
     # データ追加(レコード登録)
     sql = 'insert into sql_table (ID, Name, Statement) values (?,?,?)'
-    data = (c_username, value, "")
+    data = (c_username, value, "test sql script")
     c.execute(sql, data)
     # コミット
     conn_sql.commit()
     return html.Div("New file has created.")
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 page_3_layout = html.Div([
@@ -366,14 +383,13 @@ style={'position': 'relative', 'width': '100%', 'font-family': 'Noto Sans JP'})
 # define whole layout ------------------------
 
 app.layout = html.Div([
-    dcc.Location(id='url', refresh=False),
+    dcc.Location(id='url', refresh=True),
     html.Div(dt.DataTable(rows=[{}]), style={'display': 'none'}),
     html.Div(id='page-content')
 ])
 
 
 # --------------------------- app_table return logic ---------------------------
-
 
 # Update the index
 @app.callback(Output('page-content', 'children'),
