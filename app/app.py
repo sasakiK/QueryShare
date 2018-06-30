@@ -80,8 +80,10 @@ title_components = html.Div([
         html.Div([
             html.Div([
                 html.Div(["Query Share"], id="header"),
-                html.Div([dcc.Link(c_username, href='/add_player', id='header-right')],
+                html.Div([dcc.Link(c_username, href='/profile', id='header-right')],
                          style={'cursor': 'pointer', 'float': 'right', 'margin-right': '7%'}),
+                html.Div([dcc.Link("New query", href='/add_file', id='header-right')],
+                         style={'cursor': 'pointer', 'float': 'right'}),
                 html.Div([dcc.Link('TOP', href='/', id='header-right')],
                          style={'cursor': 'pointer', 'float': 'right'})
             ]),
@@ -123,6 +125,7 @@ page_1_layout = html.Div([
                 id='tabs',
                 # vertical=False,
                 style={
+                    'font-family': 'Montserrat'
                     }
             ),
             html.Div(id='tab-output')
@@ -146,7 +149,8 @@ style={'position': 'relative', 'width': '100%', 'font-family': 'Noto Sans JP'})
 
 
 
-@app.callback(Output('tab-output', 'children'), [Input('tabs', 'value')])
+@app.callback(Output('tab-output', 'children'),
+              [Input('tabs', 'value')])
 def display_content(value):
     test_query=[statement for statement in sql_table_current.Statement],
 
@@ -165,24 +169,26 @@ def display_content(value):
                    'height': "200px",
                    'font-family':'Monaco',
                    'font-size': "18px",
-                   'border': 'solid 2px #5DC8BB',
+                   'border': 'solid 2px #2bb6c1',
                    'border-radius': '4px'
                    }
 
         )],style={'width' : '100%'}
         ),
         html.Div([
+        html.Div([
             html.Ul([
                 html.Li(html.Button('RUN',
                                      id='button-run',
-                                     className='square_btn')),
+                                     className='button-bop')),
                 html.Li(html.Button('SAVE',
                                      id='button-save',
-                                     className='square_btn')),
+                                     className='button-bop')),
             ], style={'list-style':'none',
+                      'border': 'none',
                       'display': 'flex',
                       'justify-content': 'flex-end'})
-        ]),
+        ], id="holder")], className="container-wrap"),
     # define table app_layout
     html.Div([
         dt.DataTable(
@@ -209,20 +215,27 @@ def display_content(value):
               [Input('button-run', 'n_clicks')],
               [State('input_query', 'value')])
 def execte_query(n_clicks, value):
+    # dbに対してTextareaのvalueを実行
     conn = sqlite3.connect("data/test_db.db")
     # define statement
     statement = value
     df_fromdb = pd.read_sql(statement, conn)
+
+    # RUNのstatementに変更
+    # UPDATE テーブル名 SET カラム名 = 更新後の値 where name = 更新前の値;
+
     return df_fromdb.to_dict('records')
 
-# @app.callback([Input('button-save', 'n_clicks')],
-#               [State('input_query', 'value')])
-# def execte_query(n_clicks, value):
-#     conn = sqlite3.connect("data/test_db.db")
-#     # define statement
-#     statement = value
-#     df_fromdb = pd.read_sql(statement, conn)
-#     return df_fromdb.to_dict('records')
+@app.callback([Input('button-save', 'n_clicks')],
+              [State('input_query', 'value')])
+def execte_query(n_clicks, value):
+    c = conn_sqldb.cursor()
+    # データ追加(レコード登録)
+    sql = 'insert into sql_table (ID, Name, Statement) values (?,?,?)'
+    data = ('qs_user1', "add_sample.sql", "SELECT * FROM TEST")
+    c.execute(sql, data)
+    # コミット
+    conn_sql.commit()
 
 
 
@@ -280,15 +293,52 @@ page_2_layout = html.Div([
 ],id='wrapper',
 style={'position': 'relative', 'width': '100%', 'font-family': 'Noto Sans JP'})
 
+@app.callback([Input('button-save', 'n_clicks')],
+              [State('input_name', 'value')])
+def execte_query(n_clicks, value):
+    c = conn_sqldb.cursor()
+    # データ追加(レコード登録)
+    sql = 'insert into sql_table (ID, Name, Statement) values (?,?,?)'
+    data = ('qs_user1', "add_sample.sql", "")
+    c.execute(sql, data)
+    # コミット
+    conn_sql.commit()
+    return html.Div("New file has created.")
 
-@app.callback(Output('output-container-button', 'children'),
-              [Input('button', 'n_clicks')],
-              [State('input-box', 'value')])
-def update_output(n_clicks, value):
-    return 'RESULT : "{}" CLICKED {} times'.format(
-        value,
-        n_clicks
-    )
+
+page_3_layout = html.Div([
+
+    title_components,
+
+    html.Div([
+        html.Div([
+                html.H3("User Name is {}".format(c_username)),
+                html.Br(),
+                html.H3("Recent work is {}".format(max(df_user_table.Date))),
+                html.Br(),
+                html.Div([sql for sql in sql_table_current.Name])
+                  ],
+                 style={'width': '100%'})
+    ], style={'width': '100%', 'color': '#373939' }),
+
+    footer_components
+
+],id='wrapper',
+style={'position': 'relative', 'width': '100%', 'font-family': 'Noto Sans JP'})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # define whole layout ------------------------
 
@@ -308,8 +358,10 @@ app.layout = html.Div([
 def display_page(pathname):
     if pathname == '/':
         return page_1_layout
-    elif pathname == '/add_player':
+    elif pathname == '/add_file':
         return page_2_layout
+    elif pathname == '/profile':
+        return page_3_layout
     # You could also return a 404 "URL not found" page here
 
 

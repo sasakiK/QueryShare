@@ -8,8 +8,9 @@ html, body {
   /* background-color: #73CDC4; */
   /* background-color: #FEDC0F; */
   /* background-color: #5DC8BB; */
-  background-color: #ECE4E0;
+  /* background-color: #ECE4E0; */
   color: #666666;
+  background-color: #fdfefa;
 }
 
 /* ---------- wrapper ---------- */
@@ -93,15 +94,13 @@ div#footer {
 
 
 a {
-  color: #BDE2F5;
+  color: #2bb6c1;
   text-decoration: none;
 }
 
 /* ---------- title ---------- */
 
 h1#title_h{
- /* border-top : solid 7px #373939;
- border-bottom : solid 7px #373939; */
  padding: 5px 0;
  width: 70%;
  color: #373939;
@@ -128,37 +127,27 @@ h1#title_h{
 }
 
 
-/* ---------- submit ---------- */
+/* ---------- buttons ---------- */
 
 
-button#button-run{
-  margin-right: 15px;
-  /*padding: 0.3em 1em 0.3em 1em; */
+button.button-bop{
+  margin-right: 10px;
+  display: block;
   text-decoration: none;
-  color: #2962C4;
-  border: solid 4px #2962C4;
-  border-radius: 3px;
-  transition: .4s;
-  height: 34px;
-  font-size: 22px;
+  height:35px;
+  width: 120px;
+  line-height: 37px;
+  text-align: center;
+  color: #2bb6c1;
+  border:solid 1px #2bb6c1;
+  font-weight: bold;
+  -webkit-transition: 0.3s;
+  -moz-transition: 0.3s;
+  -o-transition: 0.3s;
+  -ms-transition: 0.3s;
+  transition: 0.3s;
 }
-button#button-run:hover{
-  background: #2962C4;
-  color: white;
-}
-
-button#button-save{
-  margin-right: 15px;
-  /*padding: 0.3em 1em 0.3em 1em; */
-  text-decoration: none;
-  color: #62C9BE;
-  border: solid 4px #62C9BE;
-  border-radius: 3px;
-  transition: .4s;
-  height: 34px;
-  font-size: 22px;
-}
-button#button-save:hover{
-  background: #62C9BE;
-  color: white;
+button.button-bop:hover{
+  background: #2bb6c1;
+  color: #fff;
 }
