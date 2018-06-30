@@ -13,6 +13,7 @@ import dash_html_components as html
 import dash_table_experiments as dt
 from dash.dependencies import Input, Output, State
 
+from flask_caching import Cache
 from flask import send_from_directory
 from loremipsum import get_sentences
 
@@ -40,6 +41,15 @@ app.title = 'Query Share'
 app.css.config.serve_locally = True
 app.scripts.config.serve_locally = True
 app.config.suppress_callback_exceptions = True
+
+CACHE_CONFIG = {
+    # try 'filesystem' if you don't want to setup redis
+    'CACHE_TYPE': 'redis',
+    'CACHE_REDIS_URL': os.environ.get('REDIS_URL', 'localhost:6379')
+}
+cache = Cache()
+cache.init_app(app.server, config=CACHE_CONFIG)
+
 
 # current _username
 c_username = auth._username_password_list[0][0]
@@ -212,30 +222,35 @@ def display_content(value):
         'background-color': "white"
     })
 @app.callback(Output('datatable', 'rows'),
-              [Input('button-run', 'n_clicks')],
+              [Input('button-run', 'n_clicks'),
+               Input('tabs', 'value')],
               [State('input_query', 'value')])
-def execte_query(n_clicks, value):
+def execte_query(n_clicks, tab_value, value):
     # dbに対してTextareaのvalueを実行
-    conn = sqlite3.connect("data/test_db.db")
+    conn = sqlite3.connect("data/sql_db.db")
     # define statement
     statement = value
     df_fromdb = pd.read_sql(statement, conn)
 
     # RUNのstatementに変更
+    c = conn_sqldb.cursor()
+    change_commit_sql = "UPDATE sql_table SET Statement = {} WHERE Index = {}".format(value, tab_value-1)
+    c.execute(change_commit_sql)
+    conn_sql.commit()
     # UPDATE テーブル名 SET カラム名 = 更新後の値 where name = 更新前の値;
 
     return df_fromdb.to_dict('records')
 
-@app.callback([Input('button-save', 'n_clicks')],
-              [State('input_query', 'value')])
-def execte_query(n_clicks, value):
-    c = conn_sqldb.cursor()
-    # データ追加(レコード登録)
-    sql = 'insert into sql_table (ID, Name, Statement) values (?,?,?)'
-    data = ('qs_user1', "add_sample.sql", "SELECT * FROM TEST")
-    c.execute(sql, data)
-    # コミット
-    conn_sql.commit()
+# @app.callback([Input('button-save', 'n_clicks')],
+#               [State('input_query', 'value')])
+# def execte_query(n_clicks, value):
+#     c = conn_sqldb.cursor()
+#     # データ追加(レコード登録)
+#     sql = 'insert into sql_table (ID, Name, Statement) values (?,?,?)'
+#     data = ('qs_user1', "add_sample.sql", "SELECT * FROM TEST")
+#     c.execute(sql, data)
+#     # コミット
+#     conn_sql.commit()
 
 
 
@@ -276,16 +291,17 @@ page_2_layout = html.Div([
 
     html.Div([
         html.Div([
-                html.H2("Please write your query name."),
+                html.H2("New file name."),
                 dcc.Input(id='input-box',
                           type='url',
-                          placeholder='please write Article title ...',
+                          placeholder='please write filename',
                           style=input_style)
                   ],
                  style={'width': '100%'}),
-        html.Button('Create', id='button', className='square_btn', style={'margin-bottom': '3%'}),
+        html.Button('Create', id='button', className='button-bop', style={'margin-bottom': '3%'}),
         html.Div(id='output-container-button',
-                 children='Enter a value and press submit')
+                 children='Enter a value and press submit'),
+        html.Div(id="save-output")
     ], style={'width': '100%', 'color': '#373939', 'font-style': 'Noto Sans JP' }),
 
     footer_components
@@ -293,13 +309,14 @@ page_2_layout = html.Div([
 ],id='wrapper',
 style={'position': 'relative', 'width': '100%', 'font-family': 'Noto Sans JP'})
 
-@app.callback([Input('button-save', 'n_clicks')],
+@app.callback(Output('save-output', 'children'),
+              [Input('button-save', 'n_clicks')],
               [State('input_name', 'value')])
-def execte_query(n_clicks, value):
+def execte_query(value):
     c = conn_sqldb.cursor()
     # データ追加(レコード登録)
     sql = 'insert into sql_table (ID, Name, Statement) values (?,?,?)'
-    data = ('qs_user1', "add_sample.sql", "")
+    data = (c_username, value, "")
     c.execute(sql, data)
     # コミット
     conn_sql.commit()
@@ -362,6 +379,8 @@ def display_page(pathname):
         return page_2_layout
     elif pathname == '/profile':
         return page_3_layout
+    else:
+        return html.Div("404 Not Found.")
     # You could also return a 404 "URL not found" page here
 
 

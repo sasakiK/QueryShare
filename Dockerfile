@@ -12,7 +12,9 @@ RUN pip install pulp \
                 #dash-core-components==0.22.1  \
                 dash_table_experiments \
                 pandas \
-                dash-auth
+                dash-auth \
+                flask_caching \
+                redis
 
 WORKDIR /app
 COPY app /app
